@@ -9,21 +9,19 @@ import torch
 import torch.nn as nn
 import copy
 
-def load_csv(csv_path):
+def load_csv(csv_path, task):
     df = pd.read_csv(csv_path)
 
     X = df.iloc[:, :-1].values.astype(np.float32)
     y_raw = df.iloc[:, -1].values
 
-    if np.issubdtype(y_raw.dtype, np.integer):
-        task = "classification"
+    if task = "classification"
         y = torch.tensor(y_raw, dtype=torch.long)
-    else:
-        task = "regression"
+    elif task = "regression":
         y = torch.tensor(y_raw, dtype=torch.float32).unsqueeze(1)
 
     X = torch.tensor(X, dtype=torch.float32)
-    return X, y, task
+    return X, y
 
 
 def split_data(X, y):
