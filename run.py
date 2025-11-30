@@ -44,7 +44,7 @@ if __name__ == "__main__":
   import argparse
   parser = argparse.ArgumentParser()
   parser.add_argument('--data', type=str, required=True, help='Path to CSV dataset')
-  parser.add_argument('--task', type=str, choices=['regression', 'classification'], required=False, help='Task type (optional if inferable from data)')
+  parser.add_argument('--task', type=str, choices=['regression', 'classification'], required=True, help='Task type (optional if inferable from data)')
   args = parser.parse_args()
 
   csv_path = args.data
