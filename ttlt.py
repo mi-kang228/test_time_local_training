@@ -6,12 +6,10 @@ import torch
 import copy
 import torch.nn as nn
 
-
 def get_k_nearest_neighbors(x_query, X, y, k):
     distances = torch.norm(X - x_query.unsqueeze(0), dim=1)
     knn_idx = torch.topk(distances, k, largest=False).indices
     return X[knn_idx], y[knn_idx], distances[knn_idx]
-
 
 def ttlt_prediction(
     x_star, model, X, y,
