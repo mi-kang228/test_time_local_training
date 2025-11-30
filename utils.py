@@ -42,3 +42,8 @@ class RegNN(nn.Module):
         return y_hat
 
       pass
+
+def get_k_nearest_neighbors(x_query, X_trn, y_trn, k):
+    distances = torch.norm(X_trn - x_query.unsqueeze(0), dim=1)
+    knn_idx = torch.topk(distances, k, largest=False).indices
+    return X_trn[knn_idx], y_trn[knn_idx], distances[knn_idx]
