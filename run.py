@@ -8,7 +8,7 @@ from ttlt import ttlt_prediction
 import torch
 
 
-def run_pipeline(csv_path):
+def run_pipeline(csv_path, task):
   X, y, task = load_csv(csv_path)
   X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y)
 
@@ -47,4 +47,4 @@ def run_pipeline(csv_path):
   return preds, y_test
 
 if __name__ == "__main__":
-  preds, y_test = run_pipeline("data.csv")
+  preds, y_test = run_pipeline("data.csv", "regression")
