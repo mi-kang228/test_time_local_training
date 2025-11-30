@@ -1,47 +1,22 @@
 import numpy as np
 import torch
-import torch.nn as nn
 
-class RegDataset():
+def load_csv(csv_path):
+    df = pd.read_csv(csv_path)
 
-    def __init__(self, X, Y):
-    
-        self.X = X
-        self.Y = Y
+    X = df.iloc[:, :-1].values.astype(np.float32)
+    y_raw = df.iloc[:, -1].values
 
-    def __len__(self):
-    
-        return len(self.X)
+    # Determine task type: classification if y is integer
+    if np.issubdtype(y_raw.dtype, np.integer):
+        task = "classification"
+        y = torch.tensor(y_raw, dtype=torch.long)
+    else:
+        task = "regression"
+        y = torch.tensor(y_raw, dtype=torch.float32).unsqueeze(1)
 
-    def __getitem__(self, idx):
-    
-        x = torch.from_numpy(self.X[idx]).float()
-        y = torch.from_numpy(self.Y[idx]).float()
-    
-        return x, y
-
-
-class RegNN(nn.Module):
-
-    def __init__(self, dim_x, n_layers=3, dim_h=100, prob_dropout=0):
-        
-        super(RegNN, self).__init__()
-
-        layers = [nn.Linear(dim_x, dim_h), nn.Tanh(), nn.Dropout(prob_dropout)]
-        for _ in range(n_layers-1):
-            layers += [nn.Linear(dim_h, dim_h), nn.Tanh(), nn.Dropout(prob_dropout)]
-        
-        layers += [nn.Linear(dim_h, 1)]
-
-        self.predict = nn.Sequential(*layers)                           
-                               
-    def forward(self, x):
-
-        y_hat = self.predict(x)
-
-        return y_hat
-
-      pass
+    X = torch.tensor(X, dtype=torch.float32)
+    return X, y, task
 
 def get_k_nearest_neighbors(x_query, X_trn, y_trn, k):
     distances = torch.norm(X_trn - x_query.unsqueeze(0), dim=1)
