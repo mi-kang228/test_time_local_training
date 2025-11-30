@@ -1,6 +1,17 @@
+"""
+ttlt.py : Test-Time Local Training (TTLT) implementation
+"""
+
 import torch
-import torch.nn as nn
 import copy
+import torch.nn as nn
+
+
+def get_k_nearest_neighbors(x_query, X, y, k):
+    distances = torch.norm(X - x_query.unsqueeze(0), dim=1)
+    knn_idx = torch.topk(distances, k, largest=False).indices
+    return X[knn_idx], y[knn_idx], distances[knn_idx]
+
 
 def ttlt_prediction(
     x_star, model, X, y,
@@ -13,7 +24,6 @@ def ttlt_prediction(
     if k is None:
         k = 100 if task == "regression" else 10
 
-    # k nearest neighbors
     X_neighbors, y_neighbors, dists = get_k_nearest_neighbors(x_star, X, y, k)
 
     eps = 1e-8
@@ -29,7 +39,6 @@ def ttlt_prediction(
     else:
         criterion = nn.CrossEntropyLoss(reduction='none')
 
-    # T iterations
     for _ in range(T):
         optimizer.zero_grad()
         preds = f_local(X_neighbors)
@@ -38,7 +47,6 @@ def ttlt_prediction(
         loss.backward()
         optimizer.step()
 
-    # final prediction
     with torch.no_grad():
         out = f_local(x_star.unsqueeze(0))
 
