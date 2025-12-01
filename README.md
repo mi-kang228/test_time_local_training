@@ -16,7 +16,7 @@ TTLT can be applied to **any supervised learning task**, including regression an
 ├── ttlt.py         # TTLT algorithm implementation
 ├── utils.py        # Data loading, splitting, neighbor search
 ├── run.py          # Training + TTLT inference pipeline
-├── data.csv        # Example dataset (last column = y)
+├── example_data.csv        # Example dataset (last column = y)
 └── README.md
 ```
 
