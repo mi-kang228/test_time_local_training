@@ -18,7 +18,7 @@ def load_csv(csv_path):
     
     return X, y
 
-def data_preprocess(X, y, task):
+def split_and_scale(X, y, task):
     x_scaler = StandardScaler()
     y_scaler = StandardScaler()
 
