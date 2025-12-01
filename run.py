@@ -2,7 +2,7 @@
 run.py : Entry point — full pipeline execution
 """
 
-from models import MLP
+from model import MLP
 from utils import load_csv, split_data, train_model
 from ttlt import ttlt_prediction
 import torch
