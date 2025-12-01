@@ -67,11 +67,11 @@ This allows the model to **adapt locally** to difficult or rare test instances.
 
 ## ▶️ Running the full pipeline
 ```
-python run.py --data data.csv --task regression
+python run.py --data example_data.csv --task regression
 ```
 Or
 ```
-python run.py --data data.csv --task classification
+python run.py --data example_data.csv --task classification
 ```
 
 The script will:
