@@ -8,8 +8,8 @@ from ttlt import ttlt_prediction
 import torch
 
 def run_pipeline(csv_path, task):
-  X, y = load_csv(csv_path, task)
-  X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y)
+  X, y = load_csv(csv_path)
+  X_train_scaled, X_val_scaled, X_test_scaled, y_train_scaled, y_val_scaled, y_test_scaled, x_scaler, y_scaler = data_preprocess(X, y, task)
 
   if task == "classification":
     output_dim = int(y.max().item() + 1)
@@ -24,13 +24,13 @@ def run_pipeline(csv_path, task):
     task=task
     )
 
-  model = train_model(model, X_train, y_train, X_val, y_val)
+  model = train_model(model, X_train_scaled, y_train_scaled, X_val_scaled, y_val_scaled)
 
   preds = []
   for i in range(len(X_test)):
     pred = ttlt_prediction(
-      X_test[i], model,
-      X_train, y_train,
+      X_test_scaled[i], model,
+      X_train_scaled, y_train_scaled,
       task=task,
       k=(100 if task == "regression" else 10),
       T=100
@@ -38,7 +38,7 @@ def run_pipeline(csv_path, task):
     preds.append(pred)
 
   preds = torch.stack(preds).squeeze()
-  return preds, y_test
+  return preds, y_test_scaled
 
 if __name__ == "__main__":
   import argparse
@@ -50,4 +50,4 @@ if __name__ == "__main__":
   csv_path = args.data
   task = args.task
   
-  preds, y_test = run_pipeline(csv_path, task)
+  preds, y_test_scaled = run_pipeline(csv_path, task)
