@@ -10,7 +10,7 @@ import torch.nn as nn
 import copy
 
 def load_csv(csv_path, task):
-    df = pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path, header=None)
 
     X = df.iloc[:, :-1].values.astype(np.float32)
     y_raw = df.iloc[:, -1].values
