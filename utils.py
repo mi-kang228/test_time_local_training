@@ -15,9 +15,9 @@ def load_csv(csv_path, task):
     X = df.iloc[:, :-1].values.astype(np.float32)
     y_raw = df.iloc[:, -1].values
 
-    if task = "classification"
+    if task == "classification"
         y = torch.tensor(y_raw, dtype=torch.long)
-    elif task = "regression":
+    elif task == "regression":
         y = torch.tensor(y_raw, dtype=torch.float32).unsqueeze(1)
 
     X = torch.tensor(X, dtype=torch.float32)
