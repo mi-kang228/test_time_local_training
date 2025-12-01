@@ -5,6 +5,7 @@ utils.py : CSV loading, splitting, and model training utilities
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 import torch
 import torch.nn as nn
 import copy
