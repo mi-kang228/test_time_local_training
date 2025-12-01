@@ -8,7 +8,7 @@ from ttlt import ttlt_prediction
 import torch
 
 def run_pipeline(csv_path, task):
-  X, y, task = load_csv(csv_path)
+  X, y = load_csv(csv_path, task)
   X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y)
 
   if task == "classification":
