@@ -9,7 +9,7 @@ import torch
 
 def run_pipeline(csv_path, task):
   X, y = load_csv(csv_path)
-  X_train_scaled, X_val_scaled, X_test_scaled, y_train_scaled, y_val_scaled, y_test_scaled, x_scaler, y_scaler = data_preprocess(X, y, task)
+  X_train_scaled, X_val_scaled, X_test_scaled, y_train_scaled, y_val_scaled, y_test_scaled, x_scaler, y_scaler = split_and_scale(X, y, task)
 
   if task == "classification":
     output_dim = int(y.max().item() + 1)
@@ -37,17 +37,30 @@ def run_pipeline(csv_path, task):
       )
     preds.append(pred)
 
-  preds = torch.stack(preds).squeeze()
-  return preds, y_test_scaled
+    preds = torch.stack(preds).squeeze()
+
+    preds_inv_scaled = y_scaler.inverse_transform(preds.view(-1, 1).cpu().numpy()).squeeze()
+    y_test_inv_scaled = y_scaler.inverse_transform(y_test_scaled.view(-1, 1).cpu().numpy()).squeeze()
+
+    results_df = pd.DataFrame({
+        'Predictions': preds_inv_scaled,
+        'Ground truth': y_test_inv_scaled
+    })
+
+    output_file = "predictions_results.csv"
+    results_df.to_csv(output_file, index=False)
+
+    return results_df
 
 if __name__ == "__main__":
-  import argparse
-  parser = argparse.ArgumentParser()
-  parser.add_argument('--data', type=str, required=True, help='Path to CSV dataset')
-  parser.add_argument('--task', type=str, choices=['regression', 'classification'], required=True, help='Task type (optional if inferable from data)')
-  args = parser.parse_args()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data', type=str, required=True, help='Path to CSV dataset')
+    parser.add_argument('--task', type=str, choices=['regression', 'classification'], required=True, help='Task type (optional if inferable from data)')
+    args = parser.parse_args()
 
-  csv_path = args.data
-  task = args.task
-  
-  preds, y_test_scaled = run_pipeline(csv_path, task)
+    csv_path = args.data
+    task = args.task
+    
+    results_df = run_pipeline(csv_path, task)
+    print(f"Results saved to {output_file}")
