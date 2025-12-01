@@ -9,27 +9,43 @@ import torch
 import torch.nn as nn
 import copy
 
-def load_csv(csv_path, task):
+def load_csv(csv_path):
     df = pd.read_csv(csv_path, header=None)
 
     X = df.iloc[:, :-1].values.astype(np.float32)
-    y_raw = df.iloc[:, -1].values
-
-    if task == "classification":
-        y = torch.tensor(y_raw, dtype=torch.long)
-    elif task == "regression":
-        y = torch.tensor(y_raw, dtype=torch.float32).unsqueeze(1)
-
-    X = torch.tensor(X, dtype=torch.float32)
+    y = df.iloc[:, -1].values
+    
     return X, y
 
+def data_preprocess(X, y, task):
+    x_scaler = StandardScaler()
+    y_scaler = StandardScaler()
 
-def split_data(X, y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=0)
-    return X_train, X_val, X_test, y_train, y_val, y_test
+    
+    X_train_scaled = x_scaler.fit_transform(X_train)
+    y_train_scaled = y_scaler.fit_transform(y_train.reshape(-1, 1)).ravel()
+    X_test_scaled = x_scaler.transform(X_test)
+    y_test_scaled = y_scaler.transform(y_test.reshape(-1, 1)).ravel()
 
+    X_train_scaled, X_val_scaled, y_train_scaled, y_val_scaled = train_test_split(X_train_scaled, y_train_scaled, test_size=0.25, random_state=0)
 
+    X_train_scaled = torch.tensor(X_train_scaled, dtype=torch.float32)
+    X_val_scaled = torch.tensor(X_val_scaled, dtype=torch.float32)
+    X_test_scaled = torch.tensor(X_test_scaled, dtype=torch.float32)
+
+    if task == "classification":
+        y_train_scaled = torch.tensor(y_train_scaled, dtype=torch.long)
+        y_val_scaled = torch.tensor(y_val_scaled, dtype=torch.long)
+        y_test_scaled = torch.tensor(y_test_scaled, dtype=torch.long)
+        
+    elif task == "regression":
+        y_train_scaled = torch.tensor(y_train_scaled, dtype=torch.float32).unsqueeze(1)
+        y_val_scaled = torch.tensor(y_val_scaled, dtype=torch.float32).unsqueeze(1)
+        y_test_scaled = torch.tensor(y_test_scaled, dtype=torch.float32).unsqueeze(1)
+
+    return X_train_scaled, X_val_scaled, X_test_scaled, y_train_scaled, y_val_scaled, y_test_scaled, x_scaler, y_scaler
+    
 def train_model(model, X_train, y_train,
                 X_val, y_val,
                 lr=1e-3,
